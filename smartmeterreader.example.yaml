@@ -1,0 +1,41 @@
+# Devices are all tty devices that provide a connection to a smart meter.
+# You may simply use the devices in /dev/*, like /dev/ttyUSB0, but this name may change after reboot
+# By using the folder /dev/serial/by-id/* you are more likely to have a unique name that wont change
+#[devices is expected to be a list object. Use dashes '- /device/name' for each entry]
+devices:
+- /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_XXXX-if00-port0
+- /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_XXXXXXXX-if00-port0
+
+# In case you have multiple meters (e.g. One dedicated for your heating system),
+# you can define an alias for the meter. The name will replace the 'Device Identification Number' OBIS 0.0.9
+#[meterNames is expected to be a dict object. Use colonss ' id: alias' for each entry]
+meterNames:
+  0123456789abcdef0123: Waermepumpe
+  abcdef0123456789abcd: Normalstrom
+
+#Define the codes which you want to see in the servers output
+#Examples:
+# 0.0.9 is the unique ID
+# 1.8.0 is the total consumption
+# 1.8.1 is the consumption of tariff 1 (if available)
+# 1.8.2 is the consumption of tariff 2 (if available)
+# 16.7.0 is the current active power
+obisCodes:
+  0.0.9:
+    name: GeraeteID
+    unit: ''
+  1.8.0:
+    name: Zaehlerstand
+    unit: Wh
+  16.7.0:
+    name: Wirkleistung
+    unit: W
+
+#Define host and port for the server to listen to
+#Examples:
+# host: 127.0.0.1, port: 80 -- The server will only listen to local connections on port 80
+# host: 0.0.0.0, port: 8000 -- The server will listen to any connection on port 8000
+server:
+  host: 127.0.0.1
+  port: 8000
+
