@@ -1,0 +1,22 @@
+# systemd service descriptor file
+# On ExecPath, set the correct path to the script file
+# Copy this file to your system:
+#  cp smartmeterreader.service /etc/systemd/system/
+# Reload the daemon
+#  sudo systemctl daemon-reload
+# Enable the service
+#  sudo systemctl enable smartmeterreader.service
+# Start the service
+#  sudo systemctl start smartmeterreader.service
+
+[Unit]
+Description=SmartMeter Data Server
+After=multi-user.target
+
+[Service]
+Type=simple
+Restart=always
+ExecStart=/usr/bin/python3 /home/<username>/smartmeterreader/smartmeterreader.py
+
+[Install]
+WantedBy=multi-user.target

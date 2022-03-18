@@ -3,8 +3,10 @@
 # By using the folder /dev/serial/by-id/* you are more likely to have a unique name that wont change
 #[devices is expected to be a list object. Use dashes '- /device/name' for each entry]
 devices:
-- /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_XXXX-if00-port0
-- /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_XXXXXXXX-if00-port0
+- device: /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_XXXX-if00-port0
+  baudrate: 9600
+- device: /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_XXXXXXXX-if00-port0
+  baudrate: 9600
 
 # In case you have multiple meters (e.g. One dedicated for your heating system),
 # you can define an alias for the meter. The name will replace the 'Device Identification Number' OBIS 0.0.9

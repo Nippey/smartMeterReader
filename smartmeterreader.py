@@ -8,7 +8,7 @@ from flask import Flask
 import yaml
 import argparse
 
-#The two connected serial ports
+#Essential config, will be overriden by YAML config file
 baseConfig = {
     "obisCodes": {
         "0.0.9":  {"name": "GeraeteID",    "unit": ""},
@@ -22,20 +22,21 @@ baseConfig = {
     },
 }
 
-
+#Global variables
 latestValues = {}
 threadList = []
 lock = threading.Lock()
 stopThreads = False
-
 app = Flask(__name__)
+
+
 
 def readMeter_thread(serialDevice):
     global lock, latestValues, stopThreads 
     
     t_frame = time.time()
 
-    with serial.Serial(serialDevice, 9600, timeout=0, exclusive=True) as ser:
+    with serial.Serial(serialDevice["device"], serialDevice["baudrate"], timeout=0, exclusive=True) as ser:
         stream = smllib.SmlStreamReader()
         print(f"Reader for '{serialDevice}' is READY!")
 
@@ -80,7 +81,7 @@ def readMeter_thread(serialDevice):
             #Update readings to be provided by the server 
             with lock:
                 latestValues[entry["name"]]=entry
-                print(f"New vales for: {entry['name']:20s} >{entry['16.7.0']['value']:8.1f}W ({t_frame-t_frameLast:.2f}s)")
+                print(f"New values for: {entry['name']:20s} >{entry['16.7.0']['value']:8.1f}W ({t_frame-t_frameLast:.2f}s)")
 
 @app.route('/')
 def index():
@@ -89,14 +90,20 @@ def index():
     with lock:
         return latestValues
 
+@app.route('/gui')
+def gui():
+    """TODO:: Add visualisation of active power consumption."""
+
+    pass
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', '--device', help='Manually provide a single device for testing instead of using the config file')
+    parser.add_argument('-b', '--baudrate', default=9600, type=int, help='Baudrate for manually define device')
     parser.add_argument('-c', '--configfile', default="smartmeterreader.yaml", help='Path to YAML config file')
     parser.add_argument('-p', '--printconfig', action='store_true', help='Output the current configuration')
     args = parser.parse_args()
-    print(args)
     
     #Prepare configuration
     with open(args.configfile,'r') as file:
@@ -106,7 +113,7 @@ if __name__ == "__main__":
     if "server" not in config:
         config["server"] = baseConfig["server"]
     if args.device:
-        config["devices"] = [args.device]
+        config["devices"] = [{"device":args.device,"baudrate":args.baudrate}]
 
     #Show configuration on request
     if args.printconfig:
